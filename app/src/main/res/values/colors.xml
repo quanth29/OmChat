@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="red_dim">#Ff4336</color>
+    <color name="green_dim">#c6ff00</color>
+    <color name="green_dark">#4caf50</color>
+    <color name="black">#000</color>
+    <color name="black_light">#444</color>
+    <color name="dark_gray_x">#666</color>
+    <color name="dark_gray">#888</color>
+    <color name="gray_bg">#ccc</color>
+    <color name="light_gray_bg">#eee</color>
+    <color name="white">#FFF</color>
+</resources>

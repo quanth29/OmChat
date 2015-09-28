@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/in/ohmama/omchat/model/OmUserInfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/in/ohmama/omchat/ui/view/RecordButton.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/in/ohmama/omchat/util/DateUtil.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/in/ohmama/omchat/util/FormatTools.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/in/ohmama/omchat/util/ImageUtil.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/in/ohmama/omchat/util/Util.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/in/ohmama/omchat/xmpp/XmppConnecionListener.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/in/ohmama/omchat/xmpp/XmppMessageInterceptor.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/progress_dialog_style.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/shape_black_round.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_loadding.xml" charset="GBK" />
+  </component>
+</project>

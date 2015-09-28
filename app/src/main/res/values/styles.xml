@@ -1,0 +1,80 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="avatorSmall">
+
+        <item name="android:padding">3dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <!--main activity-->
+    <!--toolbar-->
+    <style name="ThemeOverlay.MyApp.ActionBar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
+    <style name="Widget.MyApp.ActionBar.Solid" parent="Widget.AppCompat.ActionBar.Solid">
+        <item name="background">@color/black</item> <!-- No prefix. -->
+        <item name="elevation">4dp</item> <!-- No prefix. -->
+        <item name="titleTextStyle">@color/white</item> <!-- Style vs appearance. -->
+    </style>
+
+    <style name="Theme.MyApp" parent="Theme.AppCompat">
+        <item name="actionBarStyle">@style/Widget.MyApp.ActionBar.Solid</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.MyApp.ActionBar</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+    </style>
+
+
+    <!--chat list-->
+    <style name="chat_middle_title">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:paddingTop">@dimen/title_padding</item>
+        <item name="android:paddingBottom">@dimen/title_padding</item>
+        <item name="android:textSize">@dimen/middle_text</item>
+    </style>
+
+    <!--roster-->
+    <style name="roster_item">
+        <item name="android:layout_height">80dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <!--chating-->
+    <!--chatting content-->
+    <style name="chatbubbleBase"></style>
+
+    <style name="chatBubbleText" parent="chatbubbleBase">
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:maxWidth">200dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="chatBubbleContainer">
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="chatToBubbleContainer" parent="chatBubbleContainer">
+        <item name="android:gravity">center_vertical|right</item>
+    </style>
+    <!--chatting edit-->
+    <style name="chatting_edit">
+        <item name="android:textColor">@color/dark_gray_x</item>
+        <item name="android:layout_marginLeft">@dimen/chatting_widgt_padding</item>
+        <item name="android:layout_marginRight">@dimen/chatting_widgt_padding</item>
+    </style>
+
+    <style name="info_title_mid">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">21sp</item>
+    </style>
+</resources>

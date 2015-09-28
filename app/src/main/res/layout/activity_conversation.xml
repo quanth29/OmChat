@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="hey"></android.support.v7.widget.Toolbar>
+
+    <ListView
+        android:id="@+id/lv_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:transcriptMode="alwaysScroll"
+        android:stackFromBottom="true"
+        android:divider="@null"></ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/chatting_setmode_voice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/chatting_setmode_voice_btn"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/chatting_setmode_keyboard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/chatting_setmode_keyboard_btn" />
+
+        <EditText
+            android:id="@+id/chatting_content"
+            style="@style/chatting_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/input_bar_bg"
+            android:drawableEnd="@drawable/chatting_biaoqing_btn"
+            android:drawableRight="@drawable/chatting_biaoqing_btn"
+            android:padding="3dp"
+            android:textSize="@dimen/middle_text"
+            android:visibility="gone" />
+
+        <in.ohmama.omchat.ui.view.RecordButton
+            android:id="@+id/chatting_press_to_voice"
+            style="@style/chatting_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/chatting_content_bg"
+            android:text="@string/chatting_press_to_talk" />
+
+        <ImageView
+            android:id="@+id/chatting_type_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/type_select_btn" />
+
+        <Button
+            android:id="@+id/btn_msg_send"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_green_bg"
+            android:textColor="@color/white"
+            android:text="发送"
+            android:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>

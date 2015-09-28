@@ -1,0 +1,6 @@
+Add method to omUserDao
+public OmUser loadUserFromName(String userName){
+    QueryBuilder<OmUser> qb = DbUtil.getUserDao().queryBuilder();
+    qb.where(OmUserDao.Properties.UserName.eq(userName));
+    return qb.unique();
+}

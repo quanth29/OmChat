@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/roster_item"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:orientation="horizontal">
+
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <!--avator-->
+        <ImageView
+            android:id="@+id/iv_friend_list_avator"
+            style="@style/avatorSmall"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/find_more_friend_addfriend_icon" />
+        <!--msg count-->
+        <TextView
+            android:id="@+id/msg_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|top"
+            android:gravity="center"
+            android:text="fd"
+            android:textColor="@color/white"
+            android:textSize="11sp" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_name"
+        style="@style/info_title_mid"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="5dp"
+        android:gravity="center_vertical"
+        android:text="新的朋友" />
+
+</LinearLayout>
