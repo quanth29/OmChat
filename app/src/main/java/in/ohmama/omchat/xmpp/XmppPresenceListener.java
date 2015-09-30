@@ -75,8 +75,8 @@ public class XmppPresenceListener implements PacketListener {
                 // 通知
                 OmApplication.getContext().sendBroadcast(new Intent(Constants.ACTION_FRIEND_REQUEST));
                 Intent toMain = new Intent(OmApplication.getContext(), MainActivity.class);
-                toMain.putExtra(Constants.KEY_TO_FRAGMENT,1);
-                NotificationUtil.showNoti("收到新消息",toMain,Constants.TYPE_FRIEND_REQ);
+                toMain.putExtra(Constants.KEY_TO_FRAGMENT, 1);
+                NotificationUtil.showNoti("收到新消息", toMain, Constants.TYPE_FRIEND_REQ);
             }
         } else if (presence.getType().equals(Presence.Type.subscribed)) {// 成功添加
             LogUtil.i("friend add success 成功添加 ", toId + ", userShortName " + userShortName);
@@ -91,6 +91,7 @@ public class XmppPresenceListener implements PacketListener {
                 // 保存一条新的消息，提示用户，“可以进行对话了”
                 OmMessage msg = new OmMessage();
                 msg.setInOut(MsgInOut.MSG_IN);
+                msg.setTypeId(Constants.TYPE_MSG);
                 msg.setTime(new Date());
                 msg.setUserName(userShortName);
                 msg.setIsRead(true);

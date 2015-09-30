@@ -2,7 +2,6 @@ package in.ohmama.omchat.xmpp;
 
 import android.util.Log;
 
-
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionConfiguration;

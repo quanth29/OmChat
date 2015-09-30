@@ -33,7 +33,6 @@ public abstract class NetLoadThread {
             @Override
             protected void onPostExecute(Object result) {
                 if (isHint && (mdialog == null || !mdialog.isShowing())) {
-                    LogUtil.i("fuck");
                     return;
                 } else {
                     try {

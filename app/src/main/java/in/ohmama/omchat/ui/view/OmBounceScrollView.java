@@ -17,7 +17,7 @@ import in.ohmama.omchat.util.LogUtil;
 /**
  * Created by Leon on 9/8/15.
  */
-public class OmScrollView extends ScrollView {
+public class OmBounceScrollView extends ScrollView {
 
     // data
     private static final float MOVE_FACTOR = 0.5f; // 移动因子,手指移动100px,那么View就只移动50px
@@ -44,22 +44,22 @@ public class OmScrollView extends ScrollView {
 
     private boolean isFirstTouch = true;
 
-    public OmScrollView(Context context) {
+    public OmBounceScrollView(Context context) {
         super(context);
         init(context);
     }
 
-    public OmScrollView(Context context, AttributeSet attrs) {
+    public OmBounceScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public OmScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public OmBounceScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
-    public OmScrollView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public OmBounceScrollView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context);
     }
@@ -162,15 +162,12 @@ public class OmScrollView extends ScrollView {
                 startX = ev.getX();
                 break;
             case MotionEvent.ACTION_UP:
-                LogUtil.i("dispatchTouchEvent ACTION_UP contentView.getTop(),", contentView.getTop() + "," + slopDistance);
 
                 if (contentView.getTop() > slopDistance) {
                     if (scrollViewActiveListener != null)
                         scrollViewActiveListener.onFinishPull();
-                    LogUtil.i("dispatchTouchEvent 1");
                     bounceBottom();
                 } else {
-                    LogUtil.i("dispatchTouchEvent 2");
                     bounceBack();
                 }
 

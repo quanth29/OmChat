@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<in.ohmama.omchat.ui.view.scrollview.OmScrollRootView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillViewport="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/root_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <FrameLayout
+            android:id="@+id/header_container"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"></FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/content_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/header_container"></FrameLayout>
+    </RelativeLayout>
+</in.ohmama.omchat.ui.view.scrollview.OmScrollRootView>

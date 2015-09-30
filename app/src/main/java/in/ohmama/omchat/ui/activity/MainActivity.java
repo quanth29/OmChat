@@ -12,42 +12,54 @@ import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import in.ohmama.omchat.Constants;
 import in.ohmama.omchat.R;
 import in.ohmama.omchat.debug.DatabaseShowActivity;
 import in.ohmama.omchat.helper.RecorderHelper;
+import in.ohmama.omchat.helper2.ImageFetcher;
 import in.ohmama.omchat.model.DbUtil;
+import in.ohmama.omchat.model.OmUser;
 import in.ohmama.omchat.model.service.ComingMsgService;
 import in.ohmama.omchat.model.service.MessageService;
+import in.ohmama.omchat.model.service.UserService;
 import in.ohmama.omchat.ui.OnFragmentChangeListener;
 import in.ohmama.omchat.ui.adapter.MainAdapter;
+import in.ohmama.omchat.ui.adapter.RosterAdapter;
 import in.ohmama.omchat.ui.fragment.BaseFragemnt;
 import in.ohmama.omchat.ui.view.NestRadioGroup;
 import in.ohmama.omchat.ui.view.OmLongClickButton;
-import in.ohmama.omchat.ui.view.OmScrollView;
+import in.ohmama.omchat.ui.view.OmBounceScrollView;
+import in.ohmama.omchat.ui.view.scrollview.OmSeperateScrollViewHelper;
+import in.ohmama.omchat.util.FileUtil;
+import in.ohmama.omchat.util.ImageUtil;
 import in.ohmama.omchat.util.LogUtil;
 import in.ohmama.omchat.util.NotificationUtil;
+import in.ohmama.omchat.util.ToastUtil;
 import in.ohmama.omchat.xmpp.XmppConnectHelper;
 
 public class MainActivity extends BaseActivity implements OnFragmentChangeListener, NestRadioGroup.OnCheckedChangeListener {
 
     private ViewPager mPager;
-    private OmScrollView omScrollView;
+    private OmBounceScrollView omBounceScrollView;
     private View cancelCapture;
     private OmLongClickButton longClickButton;
-    private FrameLayout videoViewContainer;
+    private FrameLayout videoViewContainer;// 取景
+    private LinearLayout videoShootContainer;// 拍摄层
+    private FrameLayout videoReplayContainer;// 视频回放层
+
     private LinearLayout bottomTabsContainer;
     private Toolbar mToolbar;
 
@@ -67,13 +79,16 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
 
     private MainAdapter mPagerAdapter;
     private RecorderHelper videoRecordHelper;
+    private OmSeperateScrollViewHelper scrollViewHelper;
 
     private MessageService messageService;
+    private UserService userService;
     private ComingMsgService comingMsgService;
     private MainReceiver mainReceiver;
 
     // is recording the video
     private boolean isRecording = false;
+    private boolean isVideoMode = false;// 正在打开录视频中
     private long exitTime = 0;
 
     @Override
@@ -89,7 +104,7 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
         longClickButton = (OmLongClickButton) findViewById(R.id.btn_press_to_capture);
         mPager = (ViewPager) findViewById(R.id.viewpage_infos);
         cancelCapture = findViewById(R.id.cancelCapture);
-        omScrollView = (OmScrollView) findViewById(R.id.omScrollView);
+        omBounceScrollView = (OmBounceScrollView) findViewById(R.id.omScrollView);
         videoViewContainer = (FrameLayout) findViewById(R.id.videoViewContainer);
         bottomTabsContainer = (LinearLayout) findViewById(R.id.bottomTabsContainer);
         mToolbar = (Toolbar) findViewById(R.id.mToolbar);
@@ -106,12 +121,15 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
         ivRoster = (ImageView) findViewById(R.id.ivRoster);
         ivExplore = (ImageView) findViewById(R.id.ivExplore);
         ivMe = (ImageView) findViewById(R.id.ivMe);
+        videoShootContainer = (LinearLayout) findViewById(R.id.videoShootContainer);
+        videoReplayContainer = (FrameLayout) findViewById(R.id.videoReplayContainer);
 
         setToolbarTitle(0);
         setSupportActionBar(mToolbar);
 
         messageService = DbUtil.getMessageService();
         comingMsgService = DbUtil.getComingMessageService();
+        userService = DbUtil.getUserService();
 
         mPagerAdapter = new MainAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
@@ -131,16 +149,16 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
         rbMe.setOnClickListener(this);
 
         // pull down to open capture video
-        omScrollView.setScrollViewActiveListener(new OmScrollView.ScrollViewActiveListener() {
+        omBounceScrollView.setScrollViewActiveListener(new OmBounceScrollView.ScrollViewActiveListener() {
 
             @Override
             public void onFinishPull() {
                 videoRecordHelper = new RecorderHelper(MainActivity.this);
                 videoViewContainer.addView(videoRecordHelper.getCameraPreview());
-                isRecording = false;
                 // hide the bottom tabs
                 bottomTabsContainer.setVisibility(View.INVISIBLE);
-                omScrollView.setVisibility(View.INVISIBLE);
+                omBounceScrollView.setVisibility(View.INVISIBLE);
+                isVideoMode = true;
             }
 
             @Override
@@ -153,8 +171,6 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
         longClickButton.setLongclickListner(new OmLongClickButton.OmLongclickListner() {
             @Override
             public void onRepeat(int elapseTime) {
-                // press button, begin record video
-
             }
 
             @Override
@@ -166,17 +182,16 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
             @Override
             public void start() {
                 if (!isRecording) {
-//                    new MediaPrepareTask().execute();
-                    videoRecordHelper.start();
+                    new MediaPrepareTask().execute();
                 }
             }
 
             @Override
             public void stop(int elapseTime) {
+                // 停止播放
                 stopRecord();
-                // 立即播放
-                videoViewContainer.removeAllViews();
-                videoViewContainer.addView(videoRecordHelper.getVideoPreview());
+                // 打开通讯录
+                replayVideoAndShowContact();
             }
         });
 
@@ -241,23 +256,29 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (KeyEvent.KEYCODE_BACK == keyCode) {
-            if (System.currentTimeMillis() - exitTime > 2000) {
-                Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
-                exitTime = System.currentTimeMillis();
-            } else {
-                XmppConnectHelper.getInstance().closeConnection();
-                finish();
-                System.exit(0);
+        // 正在拍摄层，则执行退出
+        if (isVideoMode) {
+            stopRecord();
+            bounceBackAndReleaseRes();
+        } else {
+            if (KeyEvent.KEYCODE_BACK == keyCode) {
+                if (System.currentTimeMillis() - exitTime > 2000) {
+                    Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                    exitTime = System.currentTimeMillis();
+                } else {
+                    XmppConnectHelper.getInstance().closeConnection();
+                    finish();
+                    System.exit(0);
+                }
+            } else if (KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
+                AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+            } else if (KeyEvent.KEYCODE_VOLUME_UP == keyCode) {
+                AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
             }
-        } else if (KeyEvent.KEYCODE_VOLUME_DOWN == keyCode) {
-            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                    AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-        } else if (KeyEvent.KEYCODE_VOLUME_UP == keyCode) {
-            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                    AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
         }
         return false;
     }
@@ -282,6 +303,11 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
         changeBottomBarNum(1);
     }
 
+    /**
+     * 设置toolbar标题
+     *
+     * @param count 未读数
+     */
     public void setToolbarTitle(int count) {
         String title = "omCHAT";
         if (count > 0) {
@@ -296,17 +322,62 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
     //
     private void stopRecord() {
         videoRecordHelper.cameraStop(); // release the MediaRecorder object
+        videoViewContainer.removeAllViews(); // 去掉视频框
+        videoReplayContainer.removeAllViews();// 去掉回放层
     }
 
+    // 回放小视频，并在底下加上通讯录
+    private void replayVideoAndShowContact() {
+        scrollViewHelper = new OmSeperateScrollViewHelper()
+                .contentLayout(R.layout.scroll_contact_bottom);
+        scrollViewHelper.setmHeaderView(videoRecordHelper.getVideoPreview());// 播放录好的视频
+        View replayRootView = scrollViewHelper.createView(getLayoutInflater());
+        videoReplayContainer.addView(replayRootView);
+
+        // 通讯录
+        ListView lvContact = (ListView) replayRootView.findViewById(R.id.lv_contact);
+        final List<OmUser> userDatas = userService.loadFriend();
+        int mImageThumbSize = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_size);
+        ImageFetcher mImageFetcher = new ImageFetcher(this, mImageThumbSize);
+        RosterAdapter rosterAdapter = new RosterAdapter(this, userDatas, mImageFetcher);
+        lvContact.setAdapter(rosterAdapter);
+
+        // 发送视频
+        final String path = videoRecordHelper.path;
+        lvContact.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                try {
+                    // 发送对象
+                    XmppConnectHelper.getInstance().setRecevier(userDatas.get(position).getUserName());
+                    // 发送资源
+                    XmppConnectHelper.getInstance().sendMsgWithParms(FileUtil.parseUrlTofileName(path),
+                            new String[]{Constants.KEY_PROPERTY_MEDIA, Constants.KEY_PROPERTY_TIME_DURATION},
+                            new Object[]{ImageUtil.getBase64StringFromFile(path), videoRecordHelper.videoDuration});
+                    bounceBackAndReleaseRes();
+                } catch (Exception e) {
+                    ToastUtil.toast("发送视频出错:"+e.getMessage());
+                }
+
+            }
+        });
+    }
+
+//    private void clearReplayViews() {
+//        videoReplayContainer.removeAllViews();
+//    }
+
     private void bounceBackAndReleaseRes() {
-        if (isRecording) {
+        isVideoMode = false;
+        if (videoRecordHelper != null) {
             videoRecordHelper.cameraStop();
-            omScrollView.bounceBack();
-            omScrollView.setVisibility(View.VISIBLE);
+            omBounceScrollView.bounceBack();
+            omBounceScrollView.setVisibility(View.VISIBLE);
             videoRecordHelper.releaseCameraRes();
             videoRecordHelper.releasePlayer();
             videoViewContainer.removeAllViews();
             bottomTabsContainer.setVisibility(View.VISIBLE);
+
         }
     }
 
@@ -365,28 +436,10 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
 
         @Override
         protected String doInBackground(Void... voids) {
-
-//            String videoPath = videoRecordHelper.startRecord();
-//            if (videoPath != null) {
-//                isRecording = true;
-//            } else {
-//                Toast.makeText(MainActivity.this, "init video record fail", Toast.LENGTH_SHORT).show();
-//                LogUtil.i("init video record fail");
-//            }
+            videoRecordHelper.start();
             return "";
         }
 
-        @Override
-        protected void onPostExecute(String result) {
-//            videoViewContainer.setTag(result);
-        }
-    }
-
-    public TextureView getTextureViewInstance() {
-        TextureView mTextureView = new TextureView(this);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        mTextureView.setLayoutParams(params);
-        return mTextureView;
     }
 
     //
@@ -424,16 +477,12 @@ public class MainActivity extends BaseActivity implements OnFragmentChangeListen
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         switch (id) {

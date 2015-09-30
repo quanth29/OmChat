@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 import in.ohmama.omchat.Constants;
 import in.ohmama.omchat.R;
+import in.ohmama.omchat.helper.VideoPlayHelper;
 import in.ohmama.omchat.model.OmMessage;
 import in.ohmama.omchat.model.type.MsgInOut;
 import in.ohmama.omchat.util.LogUtil;
@@ -26,11 +28,12 @@ public class ChattingAdatper extends BaseAdapter {
 
     private List<OmMessage> chatList = new ArrayList<>();
     private Context context;
-    MediaPlayer player;
-    View playingView = null;
+    private MediaPlayer player;
+    private VideoPlayHelper playerHelper;
 
     public ChattingAdatper(Context context) {
         this.context = context;
+        playerHelper = new VideoPlayHelper(context);
     }
 
     @Override
@@ -48,6 +51,10 @@ public class ChattingAdatper extends BaseAdapter {
         return chatList.get(position).hashCode();
     }
 
+    /**
+     * @param position
+     * @return 可以返回任何数字，不同即可，不用该数字，但必须用到getItemType
+     */
     @Override
     public int getItemViewType(int position) {
         OmMessage m = getItem(position);
@@ -135,6 +142,34 @@ public class ChattingAdatper extends BaseAdapter {
                 } else {
                     chatHolder = (ChatHolder) convertView.getTag();
                 }
+                chatHolder.tvVoiceTime.setText(conv.getMediaDuration() + "\"");
+                playSound(chatHolder.chatText, conv.getTextMsg());
+                break;
+            }
+            case Constants.MSG_IN | Constants.MSG_TYPE_VIDEO: {
+                if (convertView == null) {
+                    chatHolder = new ChatHolder();
+                    convertView = LayoutInflater.from(context).inflate(R.layout.chat_video_from, null);
+//                    chatHolder.chatText = (TextView) convertView.findViewById(R.id.chatText);
+                    chatHolder.videoContainer = (FrameLayout) convertView.findViewById(R.id.chat_video_container);
+                    convertView.setTag(chatHolder);
+                } else {
+                    chatHolder = (ChatHolder) convertView.getTag();
+                }
+                chatHolder.videoContainer.addView(playerHelper.getVideoPreview(conv.getTextMsg()));
+                break;
+            }
+            case Constants.MSG_OUT | Constants.MSG_TYPE_VIDEO: {
+                if (convertView == null) {
+                    chatHolder = new ChatHolder();
+                    convertView = LayoutInflater.from(context).inflate(R.layout.chat_video_to, null);
+//                    chatHolder.chatText = (TextView) convertView.findViewById(R.id.chatText);
+                    chatHolder.videoContainer = (FrameLayout) convertView.findViewById(R.id.chat_video_container);
+                    convertView.setTag(chatHolder);
+                } else {
+                    chatHolder = (ChatHolder) convertView.getTag();
+                }
+                chatHolder.videoContainer.addView(playerHelper.getVideoPreview(conv.getTextMsg()));
                 break;
             }
         }
@@ -143,6 +178,7 @@ public class ChattingAdatper extends BaseAdapter {
     }
 
     int sessionId;
+
     public void playSound(View soundBubble, final String filePath) {
 
         soundBubble.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +188,6 @@ public class ChattingAdatper extends BaseAdapter {
                 if (player != null) {
                     // 如果在播则 停止
                     if (player.isPlaying()) {
-                        LogUtil.i("in stop");
                         player.stop();
                         player.release();
                         player = null;
@@ -164,7 +199,6 @@ public class ChattingAdatper extends BaseAdapter {
                     player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mp) {
-                            LogUtil.i("onCompletion");
                             player.stop();
                             player.release();
                             player = null;
@@ -173,7 +207,7 @@ public class ChattingAdatper extends BaseAdapter {
                 }
                 if (sessionId != player.getAudioSessionId()) {
                     try {
-                        playingView = v;
+//                        playingView = v;
                         sessionId = player.getAudioSessionId();
                         player.setDataSource(filePath);
                         player.prepare();
@@ -198,5 +232,6 @@ public class ChattingAdatper extends BaseAdapter {
         TextView tvIsReadRedDot; // 红点
         TextView tvVoiceTime; // 语音时长
         ImageView ivVoiceIcon; // 语音Icon
+        FrameLayout videoContainer;
     }
 }

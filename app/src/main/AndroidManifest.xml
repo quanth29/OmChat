@@ -23,7 +23,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".ui.activity.OmSplashActivity"
-            android:label="@string/title_activity_om_splash" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

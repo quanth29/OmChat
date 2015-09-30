@@ -11,6 +11,7 @@ import java.io.File;
 
 /**
  * Created by yanglone on 9/24/15.
+ * 视频播放
  */
 public class VideoPlayView extends SurfaceView {
 

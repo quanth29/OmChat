@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import in.ohmama.omchat.Constants;
 import in.ohmama.omchat.ui.view.CameraPreview;
 import in.ohmama.omchat.ui.view.VideoPlayView;
 
@@ -23,7 +24,7 @@ import in.ohmama.omchat.ui.view.VideoPlayView;
 public class RecorderHelper {
 
     private boolean isRecording = false;
-    static String TAG = "VideoTakeActivity2";
+    static String TAG = "RecorderHelper";
 
 
     public static final int MEDIA_TYPE_IMAGE = 1;
@@ -34,6 +35,8 @@ public class RecorderHelper {
     private VideoPlayView videoPlayPreview;
     private MediaRecorder mMediaRecorder;
     private MediaPlayer mediaPlayer;
+    public String path;
+    public int videoDuration;
 
     public RecorderHelper(Context mContext) {
         mCamera = getCameraInstance();
@@ -61,7 +64,6 @@ public class RecorderHelper {
         return videoPlayPreview;
     }
 
-    String path;
 
     public String start() {
         path = getOutputMediaFile(MEDIA_TYPE_VIDEO).toString();
@@ -80,11 +82,13 @@ public class RecorderHelper {
     }
 
     public void cameraStop() {
-        // stop recording and release camera
-        mMediaRecorder.stop();  // stop the recording
-        releaseMediaRecorder(); // release the MediaRecorder object
-        mCamera.lock();         // take camera access back from MediaRecorder
-        isRecording = false;
+        if (mMediaRecorder != null) {
+            // stop recording and release camera
+            mMediaRecorder.stop();  // stop the recording
+            releaseMediaRecorder(); // release the MediaRecorder object
+            mCamera.lock();         // take camera access back from MediaRecorder
+            isRecording = false;
+        }
     }
 
 
@@ -100,13 +104,15 @@ public class RecorderHelper {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
-        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
 
         // Step 4: Set output file
         mMediaRecorder.setOutputFile(path);
 
         // Step 5: Set the preview output
         mMediaRecorder.setPreviewDisplay(mPreview.getHolder().getSurface());
+
+        mMediaRecorder.setOrientationHint(90);
 
         // Step 6: Prepare configured MediaRecorder
         try {
@@ -130,15 +136,13 @@ public class RecorderHelper {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+        File mediaStorageDir = new File(Constants.VIDEO_PATH);
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
-                Log.d("MyCameraApp", "failed to create directory");
                 return null;
             }
         }
@@ -197,6 +201,7 @@ public class RecorderHelper {
     public void releasePlayer() {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
+            videoDuration = mediaPlayer.getDuration() / 1000;
             mediaPlayer.release();
             mediaPlayer = null;
         }

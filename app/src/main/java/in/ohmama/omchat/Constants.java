@@ -33,6 +33,7 @@ public class Constants {
     public static final int MSG_TYPE_COUNT = 6;
     // MSG TYPE SHOW
     public static String FILE_TYPE_AUDIO = "[语音]";
+    public static String FILE_TYPE_VIDEO = "[视频]";
 
     /* FILE */
     public final static String EXTRA_PATH = Util.getInstance().getExtPath() + "/omchat";
@@ -51,9 +52,10 @@ public class Constants {
     public static final String ACTION_ADD_FRIEND_REFUSED = "ACTION_ADD_FRIEND_REFUSED";
 
     /* SERVER */
-    public static String SERVER_DOMAIN = "192.168.1.107";
+//    public static String SERVER_DOMAIN = "192.168.1.107";
+    public static String SERVER_DOMAIN = "yourdomain";
     public static int SERVER_PORT = 5222;
-    public static String SERVER_NAME = "localhost";
+    public static String SERVER_NAME = "yourservername";
 
     /* DB */
     public static final String DB_NAME = "OM_CHAT";
@@ -69,7 +71,6 @@ public class Constants {
     /* BEAN */
     public final static int TYPE_MSG = 0;
     public final static int TYPE_FRIEND_REQ = 1;
-
 
 
 }

@@ -10,4 +10,5 @@
     <color name="gray_bg">#ccc</color>
     <color name="light_gray_bg">#eee</color>
     <color name="white">#FFF</color>
+    <color name="blue">#398DE3</color>
 </resources>

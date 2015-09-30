@@ -37,7 +37,7 @@ public class XmppMessageInterceptor implements PacketInterceptor {
             msg.setUserName(userName);
 
             String msgBody = null;
-            if (nowMessage.getProperty("imgData") != null) {
+            if (nowMessage.getProperty(Constants.KEY_PROPERTY_MEDIA) != null) {
                 int fileType = FileUtil.getType(nowMessage.getBody());
                 if (fileType == FileUtil.SOUND) {
                     int duration = (int) nowMessage.getProperty(Constants.KEY_PROPERTY_TIME_DURATION);

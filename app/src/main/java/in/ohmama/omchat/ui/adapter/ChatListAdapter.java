@@ -59,7 +59,7 @@ public class ChatListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ChatListHolder holder = null;
         OmMessage chat = chatList.get(position);
-//
+
         if (convertView == null) {
             holder = new ChatListHolder();
             convertView = LayoutInflater.from(mContext).inflate(R.layout.chat_list_item, null);
